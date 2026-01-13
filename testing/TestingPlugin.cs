@@ -1,0 +1,142 @@
+﻿using HarmonyLib;
+using Il2Cpp;
+using Il2CppGh.Tk;
+using MelonLoader;
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.IO;
+using System.Reflection;
+using System.Runtime.CompilerServices;
+using System.Threading;
+using Il2CppTMPro;
+using UnityEngine;
+using UnityEngine.SceneManagement;
+
+[assembly: MelonInfo(typeof(TestingPlugin), "Testing", "0.0.1", "devopsdinosaur")]
+
+public static class PluginInfo {
+
+    public static string TITLE;
+    public static string NAME;
+    public static string SHORT_DESCRIPTION = "For testing only";
+    public static string EXTRA_DETAILS = "";
+    public static string VERSION;
+    public static string AUTHOR;
+    public static string GAME_TITLE = "Tavern Keeper";
+    public static string GAME = "tavern";
+    public static string GUID;
+	public static string UNDERSCORE_GUID;
+	public static string REPO = GAME + "-mods";
+
+    static PluginInfo() {
+        System.Reflection.Assembly assembly = System.Reflection.Assembly.GetExecutingAssembly();
+        MelonInfoAttribute info = assembly.GetCustomAttribute<MelonInfoAttribute>();
+        TITLE = info.Name;
+        NAME = TITLE.ToLower().Replace(" ", "-");
+        VERSION = info.Version;
+        AUTHOR = info.Author;
+        GUID =  AUTHOR + "." + GAME + "." + NAME;
+		UNDERSCORE_GUID = GUID.Replace(".", "_").Replace("-", "_");
+
+	}
+
+    public static Dictionary<string, string> to_dict() {
+        Dictionary<string, string> info = new Dictionary<string, string>();
+        foreach (FieldInfo field in typeof(PluginInfo).GetFields((BindingFlags) 0xFFFFFFF)) {
+            info[field.Name.ToLower()] = (string) field.GetValue(null);
+        }
+        return info;
+    }
+}
+
+public class TestingPlugin : DDPlugin {
+	private static TestingPlugin m_plugin = null;
+	private static HarmonyLib.Harmony m_harmony = null;
+    
+    public override void OnInitializeMelon() {
+		try {
+			this.m_plugin_info = PluginInfo.to_dict();
+			m_plugin = this;
+			logger = LoggerInstance;
+			Settings.Instance.early_load(m_plugin);
+			create_nexus_page();
+			(m_harmony = new HarmonyLib.Harmony(PluginInfo.GUID)).PatchAll();
+		} catch (Exception e) {
+			_error_log("** OnInitializeMelon FATAL - " + e);
+		}
+	}
+
+	private static void dump_all_objects() {
+		string directory = "C:/tmp/dump_" + Il2CppSystem.Reflection.Assembly.GetExecutingAssembly().GetName().Name;
+		Directory.CreateDirectory(directory);
+		foreach (string file in Directory.GetFiles(directory, "*.json", SearchOption.TopDirectoryOnly)) {
+			File.Delete(Path.Combine(directory, file));
+		}
+		foreach (GameObject obj in SceneManager.GetActiveScene().GetRootGameObjects()) {
+			string path = null;
+			int counter = 0;
+			while (File.Exists(path = Path.Combine(directory, $"{obj.name}_{counter++:D4}.json".Replace('*', '_').Replace(':', '_'))));
+			UnityUtils.json_dump(obj.transform, path);
+		}
+	}
+
+    public override void OnUpdate() {
+		try {
+            if (Input.GetKeyDown(KeyCode.Backslash)) {
+				//dump_all_objects();
+				//Application.Quit();
+				foreach (Actor actor in Actor.AllActors) {
+					if (actor.Data.ActorType != "staff") {
+						continue;
+					}
+					_info_log(((StaffData) actor.Data).Salary);
+				}
+			}
+			
+		} catch (Exception e) {
+			_error_log("** OnUpdate ERROR - " + e);
+		}
+    }
+
+    /*
+	[HarmonyPatch(typeof(), "")]
+	class HarmonyPatch_ {
+		private static bool Prefix() {
+			
+			return true;
+		}
+	}
+
+	[HarmonyPatch(typeof(), "")]
+	class HarmonyPatch_ {
+		private static void Postfix() {
+			
+		}
+	}
+
+	[HarmonyPatch(typeof(), "")]
+	class HarmonyPatch_ {
+		private static bool Prefix() {
+			try {
+
+				return false;
+			} catch (Exception e) {
+				_error_log("** XXXXX.Prefix ERROR - " + e);
+			}
+			return true;
+		}
+	}
+
+	[HarmonyPatch(typeof(), "")]
+	class HarmonyPatch_ {
+		private static void Postfix() {
+			try {
+				
+			} catch (Exception e) {
+				_error_log("** XXXXX.Postfix ERROR - " + e);
+			}
+		}
+	}
+	*/
+}

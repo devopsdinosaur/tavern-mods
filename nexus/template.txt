@@ -1,0 +1,44 @@
+﻿
+[size=4][b][u]Description[/u][/b][/size]
+
+[[short_description]]
+[[extra_details]]
+[url=https://github.com/[[author]]/[[repo]]/blob/master/[[name]]/changelog.md]Changelog[/url]
+
+See the config options below for a complete list of features and how to use them.  If you have ideas or issues see the [i]Source Code and Bug Reporting[/i] section at the bottom of the page.  Thanks!
+
+[size=4][b][u]Installation[/u][/b][/size]
+
+[list=1]
+[*][url=https://github.com/LavaGang/MelonLoader/releases/tag/v0.7.1]Install MelonLoader[/url]
+[*]Run the game and quit to allow MelonLoader to create assemblies and Mods dir.
+[*]Download and extract this mod.
+[*]Copy the extracted files to [i]<[[game]]-home>/Mods[/i] folder.
+[*]Start the game again and enjoy!
+[/list]
+
+[size=4][b][u]Config Options[/u][/b][/size]
+
+Note that all of the options in this mod default to off or game defaults (false, zero, blank, etc) to enable the user to have as little of a "cheaty" experience as possible. 
+
+For information on how to modify these options, see the [i]Editing the Config File[/i] section below.
+
+[[config_options]]
+[size=4][b][u]Editing the Config File[/u][/b][/size]
+
+[list=1]
+[*]Open notepad or your favorite text editor (Windows Key + R then 'notepad').
+[*]File => Open.  Navigate to [i]<[[game]]-home>/UserData[/i] and open [i]MelonPreferences.cfg[/i].
+[*]Note that this file stores config data for all MelonLoader mods for this game.  Sections/categories are denoted by strings surrounded by brackets [].  Search the file for '[[underscore_guid]]' and modify the values under those sections only.  Lines starting with '#' are just comments.
+[*]After making changes, save the file and restart the game to try out the new settings!
+[/list]
+
+[size=4][b][u]Source Code and Bug Reporting[/u][/b][/size]
+
+All of my mods are open source on GitHub here: [url=https://github.com/[[author]]/[[repo]]]https://github.com/[[author]]/[[repo]][/url]
+Please let me know in the Posts section if you have problems or ideas for new mods/features.  Or, even better, you can submit issues directly on the GitHub page [url=https://github.com/[[author]]/[[repo]]/issues]here[/url]).
+
+[b]PSA[/b] - I don't do Kofi or anything anymore.  So if you like my mods then please consider donating your time or money to a good cause.  My personal favorite is [url=https://wish.org]Make a Wish[/url].
+
+Thanks a ton, and enjoy the mods!!
+dd
