@@ -6,6 +6,8 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
+using Il2CppSystem.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Threading;
@@ -86,11 +88,21 @@ public class TestingPlugin : DDPlugin {
             if (Input.GetKeyDown(KeyCode.Backslash)) {
 				//dump_all_objects();
 				//Application.Quit();
-				foreach (Actor actor in Actor.AllActors) {
-					if (actor.Data.ActorType != "staff") {
+				foreach (Staff staff in Staff.AllStaff) {
+					if (!staff.IsHired) {
 						continue;
 					}
-					_info_log(((StaffData) actor.Data).Salary);
+					staff.Data.Salary = 0;
+					staff.EnergyStat.Value = 100;
+					foreach (GameObjectXTrait trait in staff.Traits.ToList()) {
+						if (trait is DislikesJanitorRoleTrait) {
+							_info_log("!!!!!!!!!!!");
+						}
+					}
+					foreach (ActorSkill skill in staff.Skills.ToList()) {
+						skill.MinValue = skill.MaxValue;
+						_info_log(skill.EffectiveValue);
+					}
 				}
 			}
 			
@@ -98,8 +110,22 @@ public class TestingPlugin : DDPlugin {
 			_error_log("** OnUpdate ERROR - " + e);
 		}
     }
+	
+	//[HarmonyPatch(typeof(Staff), "GetSkill")]
+	//class HarmonyPatch_Staff_GetSkill {
+	//	private static void Postfix(string role, ref ActorSkill __result) {
+	//		_info_log($"GetSkill - {role}: {__result.EffectiveValue}");
+	//	}
+	//}
 
-    /*
+	//[HarmonyPatch(typeof(Staff), "GetSkillValue")]
+	//class HarmonyPatch_Staff_GetSkillValue {
+	//	private static void Postfix(string role, ref float __result) {
+	//		_info_log($"GetSkillValue - {role}: {__result}");
+	//	}
+	//}
+
+	/*
 	[HarmonyPatch(typeof(), "")]
 	class HarmonyPatch_ {
 		private static bool Prefix() {
