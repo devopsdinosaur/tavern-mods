@@ -1,0 +1,25 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <Import Project="$(SolutionDir)\solution_private.targets" />
+  <Import Project="$(SolutionDir)\solution.targets" />
+  <ItemGroup>
+    <Content Include="$(MelonPath)\Latest.log" Link="logs\Latest.log" />
+    <Content Include="$(GamePath)\Mods\nexus\$(AssemblyName)\generated.txt" Link="nexus\generated.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="..\shared\dd_utils.cs" Link="shared\dd_utils.cs" />
+  </ItemGroup>
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+    <ItemGroup>
+      <AllFiles Include="$(TargetDir)**\*.*" Exclude="$(TargetDir)**\*.pdb;$(TargetDir)**\*.deps.json" />
+      <NexusFiles Include="$(SolutionDir)\nexus\**\*.*" />
+    </ItemGroup>
+    <Delete Files="$(GamePath)\Mods\nexus\$(AssemblyName)\generated.txt" />
+    <Copy SourceFiles="@(AllFiles)" DestinationFolder="$(GamePath)\Mods\%(RecursiveDir)" />
+    <MakeDir Directories="$(GamePath)\Mods\nexus\$(AssemblyName)" />
+    <Copy SourceFiles="@(NexusFiles)" DestinationFolder="$(GamePath)\Mods\nexus\$(AssemblyName)\%(RecursiveDir)" />
+    <Delete Files="$(ProjectDir)\bin\$(TargetName).zip" />
+    <Copy SourceFiles="@(AllFiles)" DestinationFolder="$(TargetDir)..\Release\%(RecursiveDir)"></Copy>
+    <ZipDirectory SourceDirectory="$(TargetDir)..\Release" DestinationFile="$(ProjectDir)\bin\$(TargetName).zip" />
+    <RemoveDir Directories="$(TargetDir)..\Release" />
+  </Target>
+</Project>

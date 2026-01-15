@@ -10,8 +10,7 @@ See the config options below for a complete list of features and how to use them
 [size=4][b][u]Installation[/u][/b][/size]
 
 [list=1]
-[*][url=https://github.com/LavaGang/MelonLoader/releases/tag/v0.7.1]Install MelonLoader[/url]
-[*]Run the game and quit to allow MelonLoader to create assemblies and Mods dir.
+[*][url=https://www.nexusmods.com/tavernkeeper/mods/1]Install MelonLoader[/url]
 [*]Download and extract this mod.
 [*]Copy the extracted files to [i]<[[game]]-home>/Mods[/i] folder.
 [*]Start the game again and enjoy!

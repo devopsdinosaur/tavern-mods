@@ -85,29 +85,12 @@ public class TestingPlugin : DDPlugin {
 		}
 	}
 
-	private void dump_staff_traits() {
-		_info_log("\n\n== All Possible Staff Traits ==\n");
-        Type base_type = typeof(StaffTrait);
-        foreach (Type type in base_type.Assembly.GetTypes()) {
-            if (type.IsSubclassOf(base_type)) {
-                _info_log($"--> {type.Name}");
-            }
-        }
-		_info_log("\n\n== Hired + Available Staff Traits ==\n");
-        foreach (Staff staff in Staff.AllStaff) {
-            _info_log($"--> {staff.GetDisplayName()} ({(staff.IsHired ? "Hired" : "Available")}");
-            foreach (GameObjectXTrait trait in staff.Traits.ToList()) {
-				_info_log($"    .. {trait.Name}"); 
-            }
-        }
-    }
-
     public override void OnUpdate() {
 		try {
             if (Input.GetKeyDown(KeyCode.Backslash)) {
 				//dump_all_objects();
 				//Application.Quit();
-				dump_staff_traits();
+				
 			}
 			
 		} catch (Exception e) {
@@ -124,66 +107,30 @@ public class TestingPlugin : DDPlugin {
 			}
 			_info_log("Launching control coroutines.");
 			m_has_run = true;
-			MelonCoroutines.Start(modify_staff_routine());
+			MelonCoroutines.Start(testing_routine());
         }
     }
 
-    private static IEnumerator modify_staff_routine() {
-        Dictionary<int, int> original_salaries = new Dictionary<int, int>();
-		Dictionary<int, float> original_skills = new Dictionary<int, float>();
-        Type base_type = typeof(StaffTrait);
-		List<string> names = new List<string>();
-		foreach (string _word in Settings.m_staff_traits_to_remove.Value.Split(',')) {
-			string word = _word.Trim();
-			if (!string.IsNullOrEmpty(word)) {
-				names.Add(word);
-			}
-		}
-		List<string> valid_names = new List<string>();
-		foreach (Type type in base_type.Assembly.GetTypes()) {
-            if (type.IsSubclassOf(base_type)) {
-				if (names.Contains(type.Name)) {
-					valid_names.Add(type.Name);
-				}
-            }
-        }
-		string[] traits_to_be_removed = valid_names.ToArray();
-		if (Settings.m_staff_remove_traits.Value) {
-			_info_log($"The following traits will be removed from staff as encountered: {(traits_to_be_removed.Length > 0 ? string.Join(", ", traits_to_be_removed) : "None")}.");
-		}
+    private static IEnumerator testing_routine() {
         for (; ; ) {
             yield return new WaitForSeconds(1);
 			if (!Settings.m_enabled.Value) {
 				continue;
 			}
 			try {
-				foreach (Staff staff in Staff.AllStaff) {
-					if (!staff.IsHired) {
+				foreach (Tap tap in Resources.FindObjectsOfTypeAll<Tap>()) {
+					if (tap.ServiceSource == null || tap.ServiceSource._inventory == null) {
 						continue;
 					}
-					if (!original_salaries.TryGetValue(staff.GetHashCode(), out int original_salary)) {
-						original_salary = original_salaries[staff.GetHashCode()] = staff.Data.Salary;
-					}
-					staff.Data.Salary = Mathf.Max(0, Mathf.FloorToInt(original_salary * Settings.m_staff_salary_multiplier.Value));
-                    if (Settings.m_staff_infinite_energy.Value) {
-						staff.EnergyStat.Value = 100;
-					}
-					foreach (ActorSkill skill in staff.Skills.ToList()) {
-						if (!original_skills.TryGetValue(skill.GetHashCode(), out float original_skill_value)) {
-							original_skill_value = original_skills[skill.GetHashCode()] = skill._baseValue;
-						}
-						skill._baseValue = Mathf.Max(0, Mathf.Min(skill.MaxValue, original_skill_value * Settings.m_staff_skills_multiplier.Value));
-                    }
-					if (Settings.m_staff_remove_traits.Value) {
-						foreach (GameObjectXTrait trait in staff.Traits.ToList()) {
-							if (traits_to_be_removed.Contains(trait.Name)) {
-								trait.AutoRemoveInSeconds = 0;
-							}
+					foreach (GameItem item in tap.ServiceSource._inventory._inventory) {
+						if (item.Amount < item.MaxAmount) {
+							item.Amount = item.MaxAmount;
 						}
 					}
                 }
+				
 			} catch (Exception e) {
-				_warn_log("* modify_staff_routine ERROR - " + e);
+				_warn_log("* testing_routine ERROR - " + e);
             }
         }
     }
