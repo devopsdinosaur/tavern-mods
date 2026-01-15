@@ -118,17 +118,31 @@ public class TestingPlugin : DDPlugin {
 				continue;
 			}
 			try {
-				foreach (Tap tap in Resources.FindObjectsOfTypeAll<Tap>()) {
-					if (tap.ServiceSource == null || tap.ServiceSource._inventory == null) {
+				//foreach (Tap tap in Resources.FindObjectsOfTypeAll<Tap>()) {
+				//	if (tap.ServiceSource == null || tap.ServiceSource._inventory == null) {
+				//		continue;
+				//	}
+				//	foreach (GameItem item in tap.ServiceSource._inventory._inventory) {
+				//		if (item.Amount < item.MaxAmount) {
+				//			item.Amount = item.MaxAmount;
+				//		}
+				//	}
+    //            }
+                //foreach (Larder_Tile tile in Larder_Tile.AllLarder_Tiles) {
+                //    foreach (var kvp in tile._storedItemIds) {
+                //        _info_log($"{kvp.Key}: {kvp.Value}");
+                //    }
+                //}
+				foreach (Inventory inventory in Inventory.AllInventories) {
+					if (!(inventory.name == "larder_Shelf(Clone)" || inventory.name.StartsWith("Taproom_tap_tier"))) {
 						continue;
 					}
-					foreach (GameItem item in tap.ServiceSource._inventory._inventory) {
+					foreach (GameItem item in inventory._inventory) {
 						if (item.Amount < item.MaxAmount) {
 							item.Amount = item.MaxAmount;
 						}
 					}
-                }
-				
+				}
 			} catch (Exception e) {
 				_warn_log("* testing_routine ERROR - " + e);
             }
