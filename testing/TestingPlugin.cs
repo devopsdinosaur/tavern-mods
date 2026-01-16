@@ -149,6 +149,29 @@ public class TestingPlugin : DDPlugin {
         }
     }
 
+	private static bool adjust_money(ref int adjustment, string category, string reasonKey) {
+		_info_log($"AdjustMoney(adjustment: {adjustment}, category: {category}, reasonKey: {reasonKey})");
+		if (category == "Staff") {
+			adjustment = 0;
+			return false;
+		}
+		return true;
+	}
+
+	//[HarmonyPatch(typeof(GameController), "AdjustMoney", new Type[] { typeof(int), typeof(string), typeof(string), typeof(bool), typeof(bool), typeof(bool) })]
+	class HarmonyPatch_GameController_AdjustMoney_1 {
+		private static bool Prefix(ref int adjustment, string category, string reasonKey, bool unscaledTime, bool showFloatingText, bool triggerCashAudio) {
+			return adjust_money(ref adjustment, category, reasonKey);
+		}
+	}
+
+	[HarmonyPatch(typeof(GameController), "AdjustMoney", new Type[] { typeof(int), typeof(string), typeof(string), typeof(Vector3), typeof(bool), typeof(bool), typeof(bool) })]
+	class HarmonyPatch_GameController_AdjustMoney_2 {
+		private static bool Prefix(ref int adjustment, string category, string reasonKey, Vector3 spawnPosition, bool unscaledTime, bool showFloatingText, bool triggerCashAudio) {
+			return adjust_money(ref adjustment, category, reasonKey);
+		}
+	}
+
     /*
 	[HarmonyPatch(typeof(), "")]
 	class HarmonyPatch_ {

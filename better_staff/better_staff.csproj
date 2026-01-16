@@ -2,7 +2,9 @@
   <Import Project="$(SolutionDir)\solution_private.targets" />
   <Import Project="$(SolutionDir)\solution.targets" />
   <ItemGroup>
+    <Content Include="$(MelonPath)\..\UserData\MelonPreferences.cfg" Link="config\MelonPreferences.cfg" />
     <Content Include="$(MelonPath)\Latest.log" Link="logs\Latest.log" />
+    <Content Include="$(SolutionDir)\nexus\template.txt" Link="nexus\template.txt" />
     <Content Include="$(GamePath)\Mods\nexus\$(AssemblyName)\generated.txt" Link="nexus\generated.txt" />
   </ItemGroup>
   <ItemGroup>

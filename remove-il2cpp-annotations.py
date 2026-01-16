@@ -6,6 +6,18 @@ import shutil
 IN_DIR = "C:/tmp/decompiled/tavern"
 OUT_DIR = IN_DIR
 REMOVE_SEALED_CLASSES = True
+EXCLUDE_PARTIAL_STRINGS = (
+    "private static readonly System.IntPtr",
+    "NativeFieldInfoPtr_",
+    "NativeMethodInfoPtr_",
+    "NativePropertyInfoPtr_",
+)
+
+def has_excluded_string(text):
+    for check in EXCLUDE_PARTIAL_STRINGS:
+        if (check in text):
+            return True
+    return False
 
 def remove_annotations(in_root, out_root, offset):
     if (offset):
@@ -40,7 +52,7 @@ def remove_annotations(in_root, out_root, offset):
         while (line_index < len(lines)):
             line = lines[line_index]
             check_line = line.strip()
-            if (len(check_line) > 2 and check_line[0] == '[' and check_line[-1] == ']'):
+            if (len(check_line) > 2 and ((check_line[0] == '[' and check_line[-1] == ']') or has_excluded_string(check_line))):
                 line_index += 1
                 continue
             if (sealed_class_depth == 0):
