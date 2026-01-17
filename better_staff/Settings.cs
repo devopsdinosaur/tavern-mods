@@ -25,7 +25,7 @@ public class Settings {
 
     // Staff
     public static MelonPreferences_Category m_category_staff;
-    public static MelonPreferences_Entry<float> m_staff_salary_multiplier;
+    public static MelonPreferences_Entry<bool> m_staff_free_labor;
     public static MelonPreferences_Entry<bool> m_staff_perfect_skills;
     public static MelonPreferences_Entry<bool> m_staff_infinite_energy;
     public static MelonPreferences_Entry<bool> m_staff_remove_traits;
@@ -47,7 +47,7 @@ public class Settings {
 
         // Staff
         m_category_staff = MelonPreferences.CreateCategory(category_prefix + "Staff");
-        m_staff_salary_multiplier = m_category_staff.CreateEntry("Salary Multiplier", 1f, description: "Multiplier applied to hired staff salaries (float, default 1f [no change]).");
+        m_staff_free_labor = m_category_staff.CreateEntry("Free Labor", false, description: "Set to true to set staff salary to 0.  Note that the game shows the negative salary text at midnight and adds to balance sheet and achievement calcs, but it does not actually deduct the cash");
         m_staff_perfect_skills = m_category_staff.CreateEntry("Perfect Skills", false, description: "Set to true to set all staff skills to 100.");
         m_staff_infinite_energy = m_category_staff.CreateEntry("Infinite Energy", false, description: "Set to true to give hired staff infinite energy.");
         m_staff_remove_traits = m_category_staff.CreateEntry("Remove Traits", false, description: "Set to true to remove specific traits from staff (specified in the 'Traits to Remove' config var).");

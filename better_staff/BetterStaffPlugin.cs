@@ -142,9 +142,8 @@ public class BetterStaffPlugin : DDPlugin {
             if (!staff.IsHired) {
                 return;
             }
-            if (m_original_salaries.TryGetValue(staff.GetHashCode(), out int original_salary)) {
+            if (Settings.m_staff_free_labor.Value && m_original_salaries.TryGetValue(staff.GetHashCode(), out int original_salary)) {
                 staff.Data.Salary = original_salary;
-                staff.RaiseWageChangedEvent();
                 //_debug_log($"{staff.GetDisplayName()}.Salary = {staff.Data.Salary}");
             }
             if (Settings.m_staff_perfect_skills.Value) {
@@ -173,15 +172,12 @@ public class BetterStaffPlugin : DDPlugin {
                 return;
             }
             m_is_data_modded = true;
-            if (!m_original_salaries.TryGetValue(staff.GetHashCode(), out int original_salary)) {
-                original_salary = m_original_salaries[staff.GetHashCode()] = staff.Data.Salary;
-                //_debug_log($"{staff.GetDisplayName()}.OriginalSalary = {original_salary}");
-            }
-            int prev_salary = staff.Data.Salary;
-            int new_salary = Mathf.Max(0, Mathf.FloorToInt(original_salary * Settings.m_staff_salary_multiplier.Value));
-            staff.Data.Salary = new_salary;
-            if (prev_salary != new_salary) {
-                staff.RaiseWageChangedEvent();
+            if (Settings.m_staff_free_labor.Value) {
+                if (!m_original_salaries.TryGetValue(staff.GetHashCode(), out int original_salary)) {
+                    original_salary = m_original_salaries[staff.GetHashCode()] = staff.Data.Salary;
+                    //_debug_log($"{staff.GetDisplayName()}.OriginalSalary = {original_salary}");
+                }
+                staff.Data.Salary = 0;
             }
             if (Settings.m_staff_infinite_energy.Value) {
                 staff.EnergyStat.Value = 100;
@@ -209,6 +205,22 @@ public class BetterStaffPlugin : DDPlugin {
             }
         } catch (Exception e) {
             _error_log("** set_modded_values ERROR - " + e);
+        }
+    }
+
+    private static bool adjust_money(ref int adjustment, string category, string reasonKey) {
+        //_info_log($"AdjustMoney(adjustment: {adjustment}, category: {category}, reasonKey: {reasonKey})");
+        if (Settings.m_staff_free_labor.Value && category == "Staff") {
+            adjustment = 0;
+            return false;
+        }
+        return true;
+    }
+
+    [HarmonyPatch(typeof(GameController), "AdjustMoney", new Type[] { typeof(int), typeof(string), typeof(string), typeof(Vector3), typeof(bool), typeof(bool), typeof(bool) })]
+    class HarmonyPatch_GameController_AdjustMoney_1 {
+        private static bool Prefix(ref int adjustment, string category, string reasonKey, Vector3 spawnPosition, bool unscaledTime, bool showFloatingText, bool triggerCashAudio) {
+            return adjust_money(ref adjustment, category, reasonKey);
         }
     }
 

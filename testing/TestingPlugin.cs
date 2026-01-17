@@ -112,34 +112,26 @@ public class TestingPlugin : DDPlugin {
     }
 
     private static IEnumerator testing_routine() {
-        for (; ; ) {
-            yield return new WaitForSeconds(1);
+		string[] REFILL_PREFIXES = {
+			"Taproom_tap_",
+			"larder_",
+		};
+		for (; ; ) {
+            yield return new WaitForSeconds(5);
 			if (!Settings.m_enabled.Value) {
 				continue;
 			}
 			try {
-				//foreach (Tap tap in Resources.FindObjectsOfTypeAll<Tap>()) {
-				//	if (tap.ServiceSource == null || tap.ServiceSource._inventory == null) {
-				//		continue;
-				//	}
-				//	foreach (GameItem item in tap.ServiceSource._inventory._inventory) {
-				//		if (item.Amount < item.MaxAmount) {
-				//			item.Amount = item.MaxAmount;
-				//		}
-				//	}
-    //            }
-                //foreach (Larder_Tile tile in Larder_Tile.AllLarder_Tiles) {
-                //    foreach (var kvp in tile._storedItemIds) {
-                //        _info_log($"{kvp.Key}: {kvp.Value}");
-                //    }
-                //}
 				foreach (Inventory inventory in Inventory.AllInventories) {
-					if (!(inventory.name == "larder_Shelf(Clone)" || inventory.name.StartsWith("Taproom_tap_tier"))) {
-						continue;
-					}
-					foreach (GameItem item in inventory._inventory) {
-						if (item.Amount < item.MaxAmount) {
-							item.Amount = item.MaxAmount;
+					//_info_log(inventory.name);
+					foreach (string prefix in REFILL_PREFIXES) {
+						if (inventory.name.StartsWith(prefix)) {
+							foreach (GameItem item in inventory._inventory) {
+								if (item.IsItemStack && !item.IsInCraftingProcess && item.Amount < item.MaxAmount) {
+									item.Amount = item.MaxAmount;
+								}
+							}
+							break;
 						}
 					}
 				}
@@ -148,29 +140,6 @@ public class TestingPlugin : DDPlugin {
             }
         }
     }
-
-	private static bool adjust_money(ref int adjustment, string category, string reasonKey) {
-		_info_log($"AdjustMoney(adjustment: {adjustment}, category: {category}, reasonKey: {reasonKey})");
-		if (category == "Staff") {
-			adjustment = 0;
-			return false;
-		}
-		return true;
-	}
-
-	//[HarmonyPatch(typeof(GameController), "AdjustMoney", new Type[] { typeof(int), typeof(string), typeof(string), typeof(bool), typeof(bool), typeof(bool) })]
-	class HarmonyPatch_GameController_AdjustMoney_1 {
-		private static bool Prefix(ref int adjustment, string category, string reasonKey, bool unscaledTime, bool showFloatingText, bool triggerCashAudio) {
-			return adjust_money(ref adjustment, category, reasonKey);
-		}
-	}
-
-	[HarmonyPatch(typeof(GameController), "AdjustMoney", new Type[] { typeof(int), typeof(string), typeof(string), typeof(Vector3), typeof(bool), typeof(bool), typeof(bool) })]
-	class HarmonyPatch_GameController_AdjustMoney_2 {
-		private static bool Prefix(ref int adjustment, string category, string reasonKey, Vector3 spawnPosition, bool unscaledTime, bool showFloatingText, bool triggerCashAudio) {
-			return adjust_money(ref adjustment, category, reasonKey);
-		}
-	}
 
     /*
 	[HarmonyPatch(typeof(), "")]
